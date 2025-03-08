@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+        <Version>0.0.0-alpha3</Version>
+        <Authors>Ben Hutchison</Authors>
+        <Copyright>© 2025 $(Authors)</Copyright>
+        <Company>$(Authors)</Company>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>$(NoWarn);8524</NoWarn>
+        <PackageProjectUrl>https://github.com/Aldaviva/Gandi</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Aldaviva/Gandi.git</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <Description>Gandi LiveDNS API client that can create, read, update, and delete DNS records</Description>
+        <PackageTags>gandi dns livedns rest api client</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- <AdditionalFiles Include="ExceptionAdjustments.txt" /> -->
+        <InternalsVisibleTo Include="Tests;DynamicProxyGenAssembly2" />
+        <None Include="..\Readme.md;icon.png" Pack="true" PackagePath="\" />
+        <None Include="*.sln.DotSettings;*.csproj.DotSettings" Visible="false" />
+        <None Include=".\.github*\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.0-beta5" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' == 'Release'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+</Project>
