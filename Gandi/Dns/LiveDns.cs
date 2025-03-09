@@ -14,6 +14,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
         .ResolveTemplate("domain", domain)
         .Accept(GandiClient.ApplicationJsonType);
 
+    /// <inheritdoc />
     public async Task<IEnumerable<DnsRecord>> List(RecordType? type = null, string? name = null, CancellationToken cancellationToken = default) {
         if (type != null && name != null) {
             return await Get(type.Value, name, cancellationToken).ConfigureAwait(false) is { } singleResult ? [singleResult] : [];
@@ -36,6 +37,10 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
         }
     }
 
+    /// <inheritdoc />
+    public Task<DnsRecord?> Get(DnsRecord query, CancellationToken cancellationToken = default) => Get(query.Type, query.Name, cancellationToken);
+
+    /// <inheritdoc />
     public async Task<DnsRecord?> Get(RecordType type, string name, CancellationToken cancellationToken = default) {
         try {
             return await _apiBase
@@ -51,6 +56,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
         }
     }
 
+    /// <inheritdoc />
     public async Task Set(DnsRecord record, CancellationToken cancellationToken = default) {
         record = record.Values is ICollection<string> ? record : record with { Values = record.Values.ToList() }; // prevent multiple enumerations
 
@@ -72,8 +78,10 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
         }
     }
 
+    /// <inheritdoc />
     public Task Delete(DnsRecord record, CancellationToken cancellationToken = default) => Delete(record.Type, record.Name, cancellationToken);
 
+    /// <inheritdoc />
     public async Task Delete(RecordType? type, string name, CancellationToken cancellationToken = default) {
         try {
             WebTarget target = _apiBase.Path("{name}");

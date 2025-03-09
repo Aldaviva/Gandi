@@ -15,9 +15,13 @@ public class DnsRecordTests {
         DnsRecord different = new(RecordType.A, "@", DnsRecord.MinTimeToLive, "67.210.32.33");
 
         record.Should().Be(same);
+        (record == same).Should().BeTrue();
+        (record != same).Should().BeFalse();
         record.GetHashCode().Should().Be(same.GetHashCode());
 
         record.Should().NotBe(different);
+        (record == different).Should().BeFalse();
+        (record != different).Should().BeTrue();
         record.GetHashCode().Should().NotBe(different.GetHashCode());
     }
 

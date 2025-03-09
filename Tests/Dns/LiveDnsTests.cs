@@ -119,7 +119,7 @@ public class LiveDnsTests {
     public async Task GetMissing() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.NotFound));
 
-        DnsRecord? actual = await _liveDns.Get(RecordType.A, "missing");
+        DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"));
 
         actual.Should().BeNull();
 

@@ -30,7 +30,7 @@ public class GandiClientTest {
     [Fact]
     public async Task LiveDnsRequest() {
         UnfuckedHttpHandler handler     = A.Fake<UnfuckedHttpHandler>(options => options.CallsBaseMethods());
-        using GandiClient   gandiClient = new(new UnfuckedHttpClient((HttpMessageHandler) handler)) { AuthToken = "ed46842ea7f2a78ec7191373200b24b3ad1b376d" };
+        using GandiClient   gandiClient = new("ed46842ea7f2a78ec7191373200b24b3ad1b376d", new UnfuckedHttpClient((HttpMessageHandler) handler));
 
         A.CallTo(() => handler.TestableSendAsync(A<HttpRequestMessage>._, A<CancellationToken>._)).Returns(new HttpResponseMessage {
             Content = new StringContent(
@@ -51,6 +51,45 @@ public class GandiClientTest {
             req.Headers.Authorization.Parameter == "ed46842ea7f2a78ec7191373200b24b3ad1b376d" &&
             req.Headers.Accept.SequenceEqual(new[] { new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json) })
         ), A<CancellationToken>._)).MustHaveHappened();
+    }
+
+    [Fact]
+    public void AuthToken() {
+        using GandiClient client = new("4b456787b41fa06d679d43822abcc9f11a6684e7");
+        client.AuthToken.Should().Be("4b456787b41fa06d679d43822abcc9f11a6684e7");
+
+        client.AuthToken = "ecaf24354b1ed098d3c30eae2477b32665b383fe";
+        client.AuthToken.Should().Be("ecaf24354b1ed098d3c30eae2477b32665b383fe");
+    }
+
+    [Fact]
+    public void AutoDisposeHttpClientIfImplicitlyCreated() {
+        GandiClient client     = new("7abf9633e407ca1452c59bf0a607af8d452a2607");
+        HttpClient  httpClient = client.HttpClient;
+        client.Dispose();
+        Action throwIfDisposed = () => httpClient.CancelPendingRequests();
+        throwIfDisposed.Should().Throw<ObjectDisposedException>();
+    }
+
+    [Fact]
+    public void DontAutoDisposeHttpClientIfExplicitlySupplied() {
+        using HttpClient httpClient = new(new UnfuckedHttpHandler());
+        GandiClient      client     = new("4943467edda90478d1e129f37f41230d6dc55883", httpClient);
+        client.Dispose();
+        httpClient.CancelPendingRequests();
+    }
+
+    [Fact]
+    public void SpecifyHttpClientDisposalLogic() {
+        GandiClient client     = new("7abf9633e407ca1452c59bf0a607af8d452a2607", disposeHttpClient: false);
+        HttpClient  httpClient = client.HttpClient;
+        client.Dispose();
+        httpClient.CancelPendingRequests();
+
+        client = new GandiClient("4943467edda90478d1e129f37f41230d6dc55883", httpClient, true);
+        client.Dispose();
+        Action throwIfDisposed = () => httpClient.CancelPendingRequests();
+        throwIfDisposed.Should().Throw<ObjectDisposedException>();
     }
 
 }

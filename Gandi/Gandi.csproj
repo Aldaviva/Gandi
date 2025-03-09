@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-        <Version>0.0.0-alpha3</Version>
+        <Version>0.0.0-alpha4</Version>
         <Authors>Ben Hutchison</Authors>
         <Copyright>© 2025 $(Authors)</Copyright>
         <Company>$(Authors)</Company>
@@ -15,7 +15,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <Description>Gandi LiveDNS API client that can create, read, update, and delete DNS records</Description>
-        <PackageTags>gandi dns livedns rest api client</PackageTags>
+        <PackageTags>gandi dns livedns rest api client domain</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSource>true</IncludeSource>
