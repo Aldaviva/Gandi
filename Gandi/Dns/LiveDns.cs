@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Unfucked;
 using Unfucked.HTTP;
 using Unfucked.HTTP.Exceptions;
@@ -31,6 +33,8 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                     .ResolveTemplate("type", type?.ToUriString())
                     .Get<IEnumerable<DnsRecord>>(cancellationToken)
                     .ConfigureAwait(false);
+            } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
+                throw new GandiException.AuthException("Gandi auth failure", e);
             } catch (HttpRequestException e) {
                 throw new GandiException($"Failed to find records in domain {domain}", e);
             }
@@ -49,8 +53,16 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ResolveTemplate("type", type.ToUriString())
                 .Get<DnsRecord>(cancellationToken)
                 .ConfigureAwait(false);
-        } catch (NotFoundException) {
+        } catch (NotFoundException e) {
+            try {
+                if (e.ResponseBody is { } responseBody && JsonSerializer.Deserialize<JsonNode>(responseBody.Span)?["object"]?.GetValue<string>() == "HTTPNotFound") {
+                    // wrong record type or name gives a "dns-record" value instead
+                    throw new GandiException.AuthException($"Gandi auth token is for the wrong domain, not {domain}", e);
+                }
+            } catch (JsonException) { }
             return null;
+        } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
+            throw new GandiException.AuthException("Gandi auth failure", e);
         } catch (HttpRequestException e) {
             throw new GandiException($"Failed to get {type} record {name}", e);
         }
@@ -72,7 +84,11 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ResolveTemplate("type", record.Type.ToUriString())
                 .Put(JsonContent.Create(Sanitize(record), options: GandiClient.JsonOptions), cancellationToken)
                 .ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            await response.ThrowIfUnsuccessful(cancellationToken).ConfigureAwait(false);
+        } catch (NotFoundException e) {
+            throw new GandiException.AuthException($"Not authorized to edit domain {domain}, check that the Personal Access Token or API Key is for the right domain", e);
+        } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
+            throw new GandiException.AuthException("Gandi auth failure", e);
         } catch (HttpRequestException e) {
             throw new GandiException($"Failed to create or modify {record.Type} record {record.Name}", e);
         }
@@ -91,7 +107,11 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ResolveTemplate("type", type?.ToUriString())
                 .Delete(cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            await response.ThrowIfUnsuccessful(cancellationToken).ConfigureAwait(false);
+        } catch (NotFoundException e) {
+            throw new GandiException.AuthException($"Not authorized to edit domain {domain}, check that the Personal Access Token or API Key is for the right domain", e);
+        } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
+            throw new GandiException.AuthException("Gandi auth failure", e);
         } catch (HttpRequestException e) {
             throw new GandiException($"Failed to delete record {name}", e);
         }
