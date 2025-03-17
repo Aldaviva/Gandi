@@ -35,7 +35,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.0-beta5" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.0-beta7" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' == 'Release'">
