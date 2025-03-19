@@ -1,5 +1,7 @@
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using Unfucked.HTTP.Config;
+using Unfucked.HTTP.Exceptions;
 
 namespace Tests.Dns;
 
@@ -117,7 +119,10 @@ public class LiveDnsTests {
 
     [Fact]
     public async Task GetMissing() {
-        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.NotFound));
+        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.NotFound) {
+            Content = new StringContent("""{"object": "dns-record", "cause": "Not Found", "code": 404, "message": "Can't find the DNS record missing/A in the zone"}""", Encoding.UTF8,
+                MediaTypeNames.Application.Json)
+        });
 
         DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"));
 
@@ -127,6 +132,13 @@ public class LiveDnsTests {
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/missing/A"),
                 new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
         ), A<CancellationToken>._)).MustHaveHappened();
+
+        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req => req.Verb == HttpMethod.Get), A<CancellationToken>._)).ReturnsLazily(() =>
+            new HttpResponseMessage(HttpStatusCode.NotFound) {
+                Content = new StringContent("hargle invalid json", Encoding.UTF8, MediaTypeNames.Text.Plain)
+            });
+
+        (await _liveDns.Get(RecordType.A, "_test")).Should().BeNull();
     }
 
     [Fact]
@@ -166,7 +178,7 @@ public class LiveDnsTests {
     }
 
     [Fact]
-    public async Task ErrorResponses() {
+    public async Task AuthErrorResponses() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).ReturnsLazily(() => new HttpResponseMessage(HttpStatusCode.Forbidden));
 
         IEnumerable<Func<Task>> throwers = [
@@ -177,8 +189,49 @@ public class LiveDnsTests {
         ];
 
         foreach (Func<Task> thrower in throwers) {
-            await thrower.Should().ThrowAsync<GandiException>();
+            await thrower.Should().ThrowExactlyAsync<GandiException.AuthException>();
         }
+    }
+
+    [Fact]
+    public async Task OtherExceptions() {
+        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).ThrowsAsync(() =>
+            new ProcessingException(new TimeoutException(), new HttpExceptionParams(HttpMethod.Get, null, new HttpResponseMessage().Headers, null)));
+
+        IEnumerable<Func<Task>> throwers = [
+            async () => await _liveDns.List(),
+            async () => await _liveDns.Get(RecordType.A, "_test"),
+            async () => await _liveDns.Set(new DnsRecord(RecordType.A, "_test", null, "127.0.0.1")),
+            async () => await _liveDns.Delete(RecordType.A, "_test"),
+        ];
+
+        foreach (Func<Task> thrower in throwers) {
+            await thrower.Should().ThrowExactlyAsync<GandiException>();
+        }
+    }
+
+    [Fact]
+    public async Task NotFoundSometimesMeansUnauthorized() {
+        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).ReturnsLazily(() => new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        IEnumerable<Func<Task>> throwers = [
+            async () => await _liveDns.Set(new DnsRecord(RecordType.A, "_test", null, "127.0.0.1")),
+            async () => await _liveDns.Delete(RecordType.A, "_test"),
+        ];
+
+        foreach (Func<Task> thrower in throwers) {
+            await thrower.Should().ThrowExactlyAsync<GandiException.AuthException>();
+        }
+
+        A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req => req.Verb == HttpMethod.Get), A<CancellationToken>._)).ReturnsLazily(() =>
+            new HttpResponseMessage(HttpStatusCode.NotFound) {
+                Content = new StringContent(
+                    """{"object": "HTTPNotFound", "cause": "Not Found", "code": 404, "message": "The resource could not be found."}""", Encoding.UTF8,
+                    new MediaTypeHeaderValue(MediaTypeNames.Application.Json))
+            });
+
+        Func<Task<DnsRecord?>> thrower2 = async () => await _liveDns.Get(RecordType.A, "_test");
+        await thrower2.Should().ThrowExactlyAsync<GandiException.AuthException>();
     }
 
 }

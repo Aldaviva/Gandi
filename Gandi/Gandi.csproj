@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-        <Version>0.0.0-alpha5</Version>
+        <Version>1.0.0</Version>
         <Authors>Ben Hutchison</Authors>
         <Copyright>© 2025 $(Authors)</Copyright>
         <Company>$(Authors)</Company>
@@ -30,12 +30,12 @@
         <InternalsVisibleTo Include="Tests;DynamicProxyGenAssembly2" />
         <None Include="..\Readme.md;icon.png" Pack="true" PackagePath="\" />
         <None Include="*.sln.DotSettings;*.csproj.DotSettings" Visible="false" />
-        <None Include=".\.github*\**" />
+        <None Include="..\.github*\**" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.0-beta5" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.0-beta8" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' == 'Release'">

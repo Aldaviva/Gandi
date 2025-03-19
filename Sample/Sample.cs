@@ -6,7 +6,7 @@ const string patVarName = "GANDI_AUTH";
 string personalAccessToken = Environment.GetEnvironmentVariable(patVarName) ??
     throw new ArgumentNullException($"Pass a Gandi personal access token or API key with permissions to manage a domain's DNS records in the {patVarName} environment variable", (Exception?) null);
 
-using IGandiClient gandi = new GandiClient { AuthToken = personalAccessToken };
+using IGandiClient gandi = new GandiClient(personalAccessToken);
 
 ILiveDns liveDns = gandi.LiveDns("bjn.mobi");
 

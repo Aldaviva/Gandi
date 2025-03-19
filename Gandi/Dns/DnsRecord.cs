@@ -62,7 +62,7 @@ public readonly struct DnsRecord {
     /// <param name="type">The type of the record. It is recommended to not set top-level <see cref="RecordType.NS"/> records, or <see cref="RecordType.ALIAS"/> if DNSSEC is enabled.</param>
     /// <param name="name">The name of the record, without the trailing period and second-level domain name, such as <c>www</c> or <c>api.stage</c>. For the top/root/origin/apex level of your domain,
     /// pass <c>@</c> (<see cref="DnsRecord.Origin"/>).</param>
-    /// <param name="timeToLive">Optional caching period of the record in resolvers. Will be clipped to stay in the valid range [5 minutes, 30 days]. When <c>null</c> is passed, it defaults to 3 hours.</param>
+    /// <param name="timeToLive">Optional caching period of the record in resolvers. Will be clipped to stay in the valid range [5 minutes, 30 days], which are available as <see cref="MinTimeToLive"/> and <see cref="MaxTimeToLive"/>. When <c>null</c> is passed, it defaults to 3 hours.</param>
     /// <param name="values">One or more values for the DNS record.</param>
     public DnsRecord(RecordType type, string name, TimeSpan? timeToLive = null, params IEnumerable<string> values) {
         Type       = type;

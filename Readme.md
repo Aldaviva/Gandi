@@ -20,6 +20,9 @@ It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns
         1. [Get a DNS record](#get-a-dns-record)
         1. [Create or update a DNS record](#create-or-update-a-dns-record)
         1. [Delete a record](#delete-a-record)
+1. [Examples](#examples)
+    - [Dynamic DNS updates](#dynamic-dns-updates)
+    - [ACME verification](#acme-verification)
 
 <!-- /MarkdownTOC -->
 
@@ -43,7 +46,7 @@ dotnet add package Gandi
 
 ## Configuration
 
-1. Get a Gandi API authentication token, and pass it to the `AuthToken` property of `IGandiClient`. This token can be either an API Key or Personal Access Token.
+1. Get a Gandi API authentication token. This token can be either an **API Key** or **Personal Access Token**.
     - If you already have a Gandi API Key, you can use it to authenticate this client to your Gandi account.
         - If your Gandi account doesn't already have an API Key, it's too late, you [can't make one anymore](https://api.gandi.net/docs/authentication/).
         - If you don't remember your API Key, you can regenerate it using [Account](https://account.gandi.net/) › Authentication options › Developer access › API key.
@@ -58,17 +61,17 @@ dotnet add package Gandi
         1. Copy the token text. Keep it somewhere safe, because Gandi won't show it to you again.
         1. Set a calendar reminder to notify you before this token expires. There is no way for Gandi to notify you or for clients to refresh or renew tokens, so you will have to repeat all of these steps when your token eventually expires.
         1. Click Done.
-    - If you need to change the auth token of an existing `GandiClient` instance, for example if the old token expires and a new one is written to a configuration file that reloads on changes, you can set the `IGandiClient.AuthToken` property.
+    - If you need to change the auth token of an existing `GandiClient` instance, for example if the old token expires and a new one is written to a configuration file that reloads on changes, you can set the `IGandiClient.AuthToken` property any time during the lifetime of the instance.
 1. Construct a new instance of `GandiClient`, passing the Personal Access Token or API Key to the constructor.
     ```cs
     using Gandi;
 
-    using IGandiClient gandi = new GandiClient("<auth token>");
+    using IGandiClient gandi = new GandiClient("<personal access token or API key>");
     ```
 
 ##### Advanced configuration
 - You can access the `HttpClient` instance used by `GandiClient` if you want to configure timeouts, extra request headers, or add requests or response filters.
-- If you want to provide your own `HttpClient`, you can pass it to the `GandiClient(HttpClient?)` constructor. Make sure the `HttpClient`'s `HttpMessageHandler` inherits from [`IUnfuckedHttpHandler`](https://github.com/Aldaviva/Unfucked/blob/master/HTTP/UnfuckedHttpHandler.cs) (one easy way to do this is for `HttpClient` to be an [`UnfuckedHttpClient`](https://github.com/Aldaviva/Unfucked/blob/master/HTTP/UnfuckedHttpClient.cs)) so that client request authentication filters and JSON serialization work correctly.
+- If you want to provide your own `HttpClient`, you can pass it to the `GandiClient(HttpClient?)` constructor. Make sure the `HttpClient`'s `HttpMessageHandler` inherits from [`IUnfuckedHttpHandler`](https://github.com/Aldaviva/Unfucked/blob/master/HTTP/UnfuckedHttpHandler.cs) (one easy way to do this is for `HttpClient` to be an [`UnfuckedHttpClient`](https://github.com/Aldaviva/Unfucked/blob/master/HTTP/UnfuckedHttpClient.cs)) so that client request authentication filters and JSON serialization work correctly. To wrap your own `HttpMessageHandler` instance (such as a customized `SocketsHttpHandler` or `DelegatingHandler`), pass it to the `UnfuckedHttpHandler(HttpMessageHandler?)` constructor.
 
 ## Usage
 
@@ -76,13 +79,13 @@ dotnet add package Gandi
 
 Get a LiveDNS API client for your second-level/registered domain name using `IGandiClient.LiveDns(string)`. This object has async methods on it that perform HTTP calls to Gandi's LiveDNS API.
 ```cs
-var liveDns = gandi.LiveDns("mydomain.com");
+ILiveDns liveDns = gandi.LiveDns("mydomain.com");
 ```
 
 #### Find DNS records
 Return a list of all DNS records in the domain, optionally filtered by name or type (A, CNAME, etc). If no results are found, returns an empty enumeration.
 ```cs
-var liveDns = gandi.LiveDns("mydomain.com");
+ILiveDns liveDns = gandi.LiveDns("mydomain.com");
 IEnumerable<DnsRecord> allRecords = await liveDns.List();
 IEnumerable<DnsRecord> cnames     = await liveDns.List(type: RecordType.CNAME);
 IEnumerable<DnsRecord> www        = await liveDns.List(name: "www");
@@ -104,4 +107,32 @@ await liveDns.Set(new DnsRecord(RecordType.A, "www", TimeToLive.FromHours(1), "1
 Remove a record with the given name and optionally the given type. If the type is not specified, records of all types with the given name are deleted. This method returns successfully even if the record did not exist, because either way it doesn't exist after the method completes, so it's in the desired state.
 ```cs
 await liveDns.Delete(RecordTytpe.CNAME, "www");
+```
+
+## Examples
+
+### Dynamic DNS updates
+
+```cs
+using IGandiClient gandi = new GandiClient(personalAccessToken);
+
+await gandi.LiveDns("aldaviva.com").Set(new DnsRecord(RecordType.A, "west", DnsRecord.MinTimeToLive, "172.11.57.29"));
+```
+
+### ACME verification
+
+```cs
+using IGandiClient gandi = new GandiClient(personalAccessToken);
+ILiveDns liveDns = gandi.LiveDns("aldaviva.com");
+
+// Generate a new ACME order, authorization, and DNS challenge
+
+DnsRecord txtRecord = new(RecordType.TXT, "_acme-challenge.west", DnsRecord.MinTimeToLive, dnsChallengeValue);
+await liveDns.Set(txtRecord);
+
+// Repeatedly ask certificate authority to validate the challenge until its status is valid
+
+await liveDns.Delete(txtRecord);
+
+// Generate a private key and certificate signing request, then request a certificate chain from the CA
 ```
