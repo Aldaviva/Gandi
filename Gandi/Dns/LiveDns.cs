@@ -2,7 +2,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Unfucked;
 using Unfucked.HTTP;
 using Unfucked.HTTP.Exceptions;
 
@@ -10,19 +9,22 @@ namespace Gandi.Dns;
 
 internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
 
-    private readonly WebTarget _apiBase = gandi.HttpClient
+    private readonly IWebTarget _apiBase = gandi.HttpClient
         .Target(GandiClient.ApiBase)
         .Path("livedns/domains/{domain}/records")
         .ResolveTemplate("domain", domain)
         .Accept(GandiClient.ApplicationJsonType);
 
     /// <inheritdoc />
+    public string Domain { get; } = domain;
+
+    /// <inheritdoc />
     public async Task<IEnumerable<DnsRecord>> List(RecordType? type = null, string? name = null, CancellationToken cancellationToken = default) {
         if (type != null && name != null) {
-            return await Get(type.Value, name, cancellationToken).ConfigureAwait(false) is { } singleResult ? [singleResult] : [];
+            return await Get(type.Value, name, cancellationToken).ConfigureAwait(false) is {} singleResult ? [singleResult] : [];
         } else {
             try {
-                WebTarget target = _apiBase;
+                IWebTarget target = _apiBase;
                 if (name != null) {
                     target = target.Path("{name}");
                 } else if (type != null) {
@@ -36,7 +38,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
             } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
                 throw new GandiException.AuthException("Gandi auth failure", e);
             } catch (HttpRequestException e) {
-                throw new GandiException($"Failed to find records in domain {domain}", e);
+                throw new GandiException($"Failed to find records in domain {Domain}", e);
             }
         }
     }
@@ -55,11 +57,11 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ConfigureAwait(false);
         } catch (NotFoundException e) {
             try {
-                if (e.ResponseBody is { } responseBody && JsonSerializer.Deserialize<JsonNode>(responseBody.Span)?["object"]?.GetValue<string>() == "HTTPNotFound") {
+                if (e.ResponseBody is {} responseBody && JsonSerializer.Deserialize<JsonNode>(responseBody.Span)?["object"]?.GetValue<string>() == "HTTPNotFound") {
                     // wrong record type or name gives a "dns-record" value instead
-                    throw new GandiException.AuthException($"Gandi auth token is for the wrong domain, not {domain}", e);
+                    throw new GandiException.AuthException($"Gandi auth token is for the wrong domain, not {Domain}", e);
                 }
-            } catch (JsonException) { }
+            } catch (JsonException) {}
             return null;
         } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
             throw new GandiException.AuthException("Gandi auth failure", e);
@@ -86,7 +88,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ConfigureAwait(false);
             await response.ThrowIfUnsuccessful(cancellationToken).ConfigureAwait(false);
         } catch (NotFoundException e) {
-            throw new GandiException.AuthException($"Not authorized to edit domain {domain}, check that the Personal Access Token or API Key is for the right domain", e);
+            throw new GandiException.AuthException($"Not authorized to edit domain {Domain}, check that the Personal Access Token or API Key is for the right domain", e);
         } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
             throw new GandiException.AuthException("Gandi auth failure", e);
         } catch (HttpRequestException e) {
@@ -100,7 +102,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
     /// <inheritdoc />
     public async Task Delete(RecordType? type, string name, CancellationToken cancellationToken = default) {
         try {
-            WebTarget target = _apiBase.Path("{name}");
+            IWebTarget target = _apiBase.Path("{name}");
             target = type != null ? target.Path("{type}") : target;
             using HttpResponseMessage response = await target
                 .ResolveTemplate("name", name)
@@ -109,7 +111,7 @@ internal class LiveDns(IGandiClient gandi, string domain): ILiveDns {
                 .ConfigureAwait(false);
             await response.ThrowIfUnsuccessful(cancellationToken).ConfigureAwait(false);
         } catch (NotFoundException e) {
-            throw new GandiException.AuthException($"Not authorized to edit domain {domain}, check that the Personal Access Token or API Key is for the right domain", e);
+            throw new GandiException.AuthException($"Not authorized to edit domain {Domain}, check that the Personal Access Token or API Key is for the right domain", e);
         } catch (ClientErrorException e) when (e is ForbiddenException or NotAuthorizedException) {
             throw new GandiException.AuthException("Gandi auth failure", e);
         } catch (HttpRequestException e) {

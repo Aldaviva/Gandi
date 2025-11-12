@@ -15,7 +15,7 @@ foreach (DnsRecord record in await liveDns.List()) {
 }
 
 Console.WriteLine("Upserting record...");
-await liveDns.Set(new DnsRecord(RecordType.TXT, "_test", null, DateTime.Now.ToString("F")));
+await liveDns.Set(new DnsRecord(RecordType.TXT, "_test", DnsRecord.MinTimeToLive, DateTime.Now.ToString("F")));
 
 Console.WriteLine("Fetching record...");
 Console.WriteLine($"Found: {(await liveDns.Get(RecordType.TXT, "_test"))!.Value.Values.First()}");

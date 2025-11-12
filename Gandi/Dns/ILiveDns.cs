@@ -6,6 +6,11 @@
 public interface ILiveDns {
 
     /// <summary>
+    /// The registered, second-level domain name that this LiveDNS client will interact with.
+    /// </summary>
+    string Domain { get; }
+
+    /// <summary>
     /// Find all DNS records in the domain, with optional filtering on the name and type of the records.
     /// </summary>
     /// <param name="type">Only return records of this type. If omitted, returns records of all types. Never returns any <c>SOA</c>, <c>DS</c>, or <c>DNSKEY</c> records, or the top-level

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Text.Json.Serialization;
-using Unfucked;
 
 namespace Gandi.Dns;
 

@@ -7,7 +7,7 @@ Gandi
 
 This library allows you to create, read, update, and delete [LiveDNS](https://www.gandi.net/en-US/domain/dns) DNS records in your [Gandi](https://www.gandi.net/) [domains](https://www.gandi.net/en-US/domain).
 
-It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns), but it's compatible with both Personal Access Token and API Key authentication, public types have interfaces so you can mock and actually test your dependent code, and it's compatible with a wider variety of runtimes.
+It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns), but it allows both Personal Access Token and API Key authentication, public types have interfaces so you can mock and actually test your dependent code, and it's compatible with a wider variety of runtimes.
 
 <!-- MarkdownTOC autolink="true" bracket="round" autoanchor="false" levels="1,2,3,4" bullets="1.,-" -->
 
@@ -101,13 +101,13 @@ DnsRecord? wwwRecord = await liveDns.Get(RecordType.A, "www");
 #### Create or update a DNS record
 Set a DNS record's value, automatically creating it if it didn't already exist, or modifying it if it already existed (upserting). To specify a record at the root/origin of your domain, pass `@` as the name. The time to live is optional, defaults to 3 hours if you set it to `null`, and is clipped to the allowed range \[5 minutes, 30 days]. You must supply at least one value for the record (for example, an IPv4 address for an A record).
 ```cs
-await liveDns.Set(new DnsRecord(RecordType.A, "www", TimeToLive.FromHours(1), "1.2.3.4"));
+await liveDns.Set(new DnsRecord(RecordType.A, "www", TimeSpan.FromHours(1), "1.2.3.4"));
 ```
 
 #### Delete a record
 Remove a record with the given name and optionally the given type. If the type is not specified, records of all types with the given name are deleted. This method returns successfully even if the record did not exist, because either way it doesn't exist after the method completes, so it's in the desired state.
 ```cs
-await liveDns.Delete(RecordTytpe.CNAME, "www");
+await liveDns.Delete(RecordType.CNAME, "www");
 ```
 
 ## Examples

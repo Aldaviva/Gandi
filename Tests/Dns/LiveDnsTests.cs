@@ -34,7 +34,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records"),
-                new[] { new KeyValuePair<string, string>("Accept", MediaTypeNames.Application.Json) }, null))
+                new[] { new KeyValuePair<string, string>("Accept", MediaTypeNames.Application.Json) }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -55,7 +55,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records?rrset_type=A"),
-                new[] { new KeyValuePair<string, string>("Accept", MediaTypeNames.Application.Json) }, null))
+                new[] { new KeyValuePair<string, string>("Accept", MediaTypeNames.Application.Json) }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -75,7 +75,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west"),
-                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
+                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -95,7 +95,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"),
-                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
+                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -113,7 +113,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"),
-                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
+                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -130,7 +130,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Get, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/missing/A"),
-                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
+                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req => req.Verb == HttpMethod.Get), A<CancellationToken>._)).ReturnsLazily(() =>
@@ -149,7 +149,7 @@ public class LiveDnsTests {
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Delete, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/deleteme/A"),
-                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null))
+                new[] { new KeyValuePair<string, string>("Accept", "application/json") }, null, null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -165,7 +165,7 @@ public class LiveDnsTests {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Put, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/_test/TXT"),
                 new[] { new KeyValuePair<string, string>("Accept", "application/json") },
-                new StringContent("""{"rrset_type":"TXT","rrset_name":"_test","rrset_values":["hi"]}""", Encoding.UTF8, MediaTypeNames.Application.Json)))
+                new StringContent("""{"rrset_type":"TXT","rrset_name":"_test","rrset_values":["hi"]}""", Encoding.UTF8, MediaTypeNames.Application.Json), null))
         ), A<CancellationToken>._)).MustHaveHappened();
     }
 
@@ -196,7 +196,7 @@ public class LiveDnsTests {
     [Fact]
     public async Task OtherExceptions() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).ThrowsAsync(() =>
-            new ProcessingException(new TimeoutException(), new HttpExceptionParams(HttpMethod.Get, null, new HttpResponseMessage().Headers, null)));
+            new ProcessingException(new TimeoutException(), new HttpExceptionParams(HttpMethod.Get, null, new HttpResponseMessage().Headers)));
 
         IEnumerable<Func<Task>> throwers = [
             async () => await _liveDns.List(),
