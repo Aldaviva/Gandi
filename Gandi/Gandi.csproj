@@ -40,7 +40,7 @@
     </ItemGroup>
     
     <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-        <PackageReference Include="System.Net.Http.Json" Version="10.0.0" />
+        <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
     </ItemGroup>
     
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' != 'Debug'">
