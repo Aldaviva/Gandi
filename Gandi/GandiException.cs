@@ -1,5 +1,3 @@
-﻿using Unfucked.HTTP.Exceptions;
-
 namespace Gandi;
 
 /// <summary>

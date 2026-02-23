@@ -1,4 +1,4 @@
-﻿using Gandi.Marshal;
+using Gandi.Marshal;
 using System.Text.Json;
 
 namespace Tests.Marshal;

@@ -1,4 +1,4 @@
-﻿using Gandi.Dns;
+using Gandi.Dns;
 
 namespace Gandi;
 

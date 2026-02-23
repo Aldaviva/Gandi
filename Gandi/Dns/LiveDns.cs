@@ -1,9 +1,5 @@
-﻿using System.Linq;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using Unfucked.HTTP;
-using Unfucked.HTTP.Exceptions;
 
 namespace Gandi.Dns;
 

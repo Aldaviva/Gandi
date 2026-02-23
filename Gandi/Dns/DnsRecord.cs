@@ -1,6 +1,3 @@
-﻿using System.Linq;
-using System.Text.Json.Serialization;
-
 namespace Gandi.Dns;
 
 /// <summary>

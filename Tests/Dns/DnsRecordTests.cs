@@ -1,4 +1,4 @@
-﻿namespace Tests.Dns;
+namespace Tests.Dns;
 
 public class DnsRecordTests {
 

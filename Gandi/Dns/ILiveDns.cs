@@ -1,4 +1,4 @@
-﻿namespace Gandi.Dns;
+namespace Gandi.Dns;
 
 /// <summary>
 /// Client for Gandi LiveDNS Management API. Used to create, read, update, and delete DNS records for a given domain whose DNS is hosted by Gandi.

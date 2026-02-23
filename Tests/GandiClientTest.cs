@@ -1,4 +1,4 @@
-﻿using Gandi.Marshal;
+using Gandi.Marshal;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text.Json;
@@ -16,7 +16,7 @@ public class GandiClientTest {
         gandiClient.HttpClient.Should().BeOfType<UnfuckedHttpClient>();
         gandiClient.HttpClient.Timeout.Should().Be(TimeSpan.FromSeconds(10));
         UnfuckedHttpClient httpClient = (UnfuckedHttpClient) gandiClient.HttpClient;
-        httpClient.Handler.RequestFilters.Should().ContainItemsAssignableTo<GandiAuthenticationFilter>();
+        httpClient.Handler!.RequestFilters.Should().ContainItemsAssignableTo<GandiAuthenticationFilter>();
         httpClient.Handler.Property(PropertyKey.JsonSerializerOptions, out JsonSerializerOptions? jsonOptions).Should().BeTrue();
         jsonOptions!.PropertyNameCaseInsensitive.Should().BeTrue();
         jsonOptions.PropertyNamingPolicy.Should().Be(JsonNamingPolicy.SnakeCaseLower);
@@ -30,7 +30,7 @@ public class GandiClientTest {
     [Fact]
     public async Task LiveDnsRequest() {
         UnfuckedHttpHandler handler     = A.Fake<UnfuckedHttpHandler>(options => options.CallsBaseMethods());
-        using GandiClient   gandiClient = new("ed46842ea7f2a78ec7191373200b24b3ad1b376d", new UnfuckedHttpClient((HttpMessageHandler) handler));
+        using GandiClient   gandiClient = new("ed46842ea7f2a78ec7191373200b24b3ad1b376d", new UnfuckedHttpClient(handler));
 
         A.CallTo(() => handler.TestableSendAsync(A<HttpRequestMessage>._, A<CancellationToken>._)).Returns(new HttpResponseMessage {
             Content = new StringContent(

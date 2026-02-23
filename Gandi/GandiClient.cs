@@ -1,9 +1,6 @@
-﻿using Gandi.Dns;
+using Gandi.Dns;
 using Gandi.Marshal;
 using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Unfucked.HTTP;
 using Unfucked.HTTP.Config;
 
 namespace Gandi;

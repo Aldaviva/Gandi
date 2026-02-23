@@ -1,4 +1,4 @@
-﻿using Gandi;
+using Gandi;
 using Gandi.Dns;
 
 const string patVarName = "GANDI_AUTH";
