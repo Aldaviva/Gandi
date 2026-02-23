@@ -39,7 +39,7 @@ public class GandiClientTest {
         });
 
         ILiveDns   liveDns = gandiClient.LiveDns("aldaviva.com");
-        DnsRecord? actual  = await liveDns.Get(RecordType.A, DnsRecord.Origin);
+        DnsRecord? actual  = await liveDns.Get(RecordType.A, DnsRecord.Origin, TestContext.Current.CancellationToken);
 
         actual.Should().Be(new DnsRecord(RecordType.A, "@", TimeSpan.FromDays(7), "67.210.32.33"));
 

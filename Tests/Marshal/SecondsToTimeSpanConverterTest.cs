@@ -20,7 +20,7 @@ public class SecondsToTimeSpanConverterTest {
         using MemoryStream         jsonStream = new();
         await using Utf8JsonWriter writer     = new(jsonStream);
         _converter.Write(writer, TimeSpan.FromMinutes(5), JsonSerializerOptions.Default);
-        await writer.FlushAsync();
+        await writer.FlushAsync(TestContext.Current.CancellationToken);
         jsonStream.ToArray().Should().Equal("300"u8.ToArray());
     }
 

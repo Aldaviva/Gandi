@@ -11,6 +11,8 @@ public class LiveDnsTests {
     private readonly LiveDns            _liveDns;
     private readonly UnfuckedHttpClient _httpClient = A.Fake<UnfuckedHttpClient>();
 
+    private static CancellationToken Ct => TestContext.Current.CancellationToken;
+
     public LiveDnsTests() {
         _httpClient.Property(PropertyKey.JsonSerializerOptions, GandiClient.JsonOptions);
         A.CallTo(() => _gandi.HttpClient).Returns(_httpClient);
@@ -25,7 +27,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List();
+        IEnumerable<DnsRecord> actual = await _liveDns.List(cancellationToken: Ct);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "67.210.32.33"),
@@ -46,7 +48,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A);
+        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, cancellationToken: Ct);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "67.210.32.33"),
@@ -67,7 +69,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(name: "west");
+        IEnumerable<DnsRecord> actual = await _liveDns.List(name: "west", cancellationToken: Ct);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
@@ -87,7 +89,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, "west");
+        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, "west", Ct);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
@@ -107,7 +109,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        DnsRecord? actual = await _liveDns.Get(RecordType.A, "west");
+        DnsRecord? actual = await _liveDns.Get(RecordType.A, "west", Ct);
 
         actual.Should().Be(new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29"));
 
@@ -124,7 +126,7 @@ public class LiveDnsTests {
                 MediaTypeNames.Application.Json)
         });
 
-        DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"));
+        DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"), Ct);
 
         actual.Should().BeNull();
 
@@ -138,14 +140,14 @@ public class LiveDnsTests {
                 Content = new StringContent("hargle invalid json", Encoding.UTF8, MediaTypeNames.Text.Plain)
             });
 
-        (await _liveDns.Get(RecordType.A, "_test")).Should().BeNull();
+        (await _liveDns.Get(RecordType.A, "_test", Ct)).Should().BeNull();
     }
 
     [Fact]
     public async Task Delete() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.NoContent));
 
-        await _liveDns.Delete(new DnsRecord(RecordType.A, "deleteme"));
+        await _liveDns.Delete(new DnsRecord(RecordType.A, "deleteme"), Ct);
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Delete, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/deleteme/A"),
@@ -160,7 +162,7 @@ public class LiveDnsTests {
             Headers = { Location = new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/_test/TXT") }
         });
 
-        await _liveDns.Set(new DnsRecord(RecordType.TXT, "_test", null, "hi"));
+        await _liveDns.Set(new DnsRecord(RecordType.TXT, "_test", null, "hi"), Ct);
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Put, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/_test/TXT"),
