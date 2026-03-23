@@ -16,6 +16,6 @@ public class GandiException(string message, Exception cause): ApplicationExcepti
     /// </summary>
     /// <param name="message">Description of the problem</param>
     /// <param name="cause">Underlying issue, usually a subclass of <see cref="HttpException"/> (such as <see cref="NotAuthorizedException"/> or <see cref="ForbiddenException"/>).</param>
-    public class AuthException(string message, Exception cause): GandiException(message, cause);
+    public sealed class AuthException(string message, Exception cause): GandiException(message, cause);
 
 }

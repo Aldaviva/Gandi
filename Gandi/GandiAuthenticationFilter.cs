@@ -4,7 +4,7 @@ using HttpHeaders = Unfucked.HTTP.HttpHeaders;
 
 namespace Gandi;
 
-internal class GandiAuthenticationFilter(Func<string?> authTokenProvider): ClientRequestFilter {
+internal sealed class GandiAuthenticationFilter(Func<string?> authTokenProvider): ClientRequestFilter {
 
     private const string BearerScheme = "Bearer";
     private const string ApiKeyScheme = "Apikey";
