@@ -8,6 +8,7 @@
         <Company>$(Authors)</Company>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
+        <WarningsAsErrors>CA1859</WarningsAsErrors>
         <PackageProjectUrl>https://github.com/Aldaviva/Gandi</PackageProjectUrl>
         <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
         <PackageReleaseNotes>$(PackageProjectUrl)/releases/tag/$(Version)</PackageReleaseNotes>
@@ -23,7 +24,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile> 
     </PropertyGroup>
 
     <ItemGroup>
@@ -36,10 +37,10 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.105,10.0.200)" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.26" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.28" />
     </ItemGroup>
     
-    <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', '$(TargetFramework)'))">
         <PackageReference Include="System.Net.Http.Json" Version="10.0.5" />
     </ItemGroup>
     

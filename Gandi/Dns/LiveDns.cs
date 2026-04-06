@@ -120,7 +120,7 @@ internal sealed class LiveDns(IGandiClient gandi, string domain): ILiveDns {
     }
 
     private static DnsRecord Sanitize(DnsRecord input) => input with {
-        Name = input.Name.EmptyToNull() ?? DnsRecord.Origin,
+        Name = input.Name.EmptyToNull ?? DnsRecord.Origin,
         TimeToLive = input.TimeToLive == TimeSpan.Zero ? null : input.TimeToLive?.Clip(DnsRecord.MinTimeToLive, DnsRecord.MaxTimeToLive)
     };
 

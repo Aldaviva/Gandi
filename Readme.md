@@ -41,7 +41,7 @@ It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns
 This library is available in the [**`Gandi`**](https://www.nuget.org/packages/Gandi) package on NuGet Gallery.
 
 ```sh
-dotnet add package Gandi
+dotnet package add Gandi
 ```
 
 ## Configuration

@@ -10,7 +10,7 @@ internal sealed class GandiAuthenticationFilter(Func<string?> authTokenProvider)
     private const string ApiKeyScheme = "Apikey";
 
     public ValueTask<HttpRequestMessage> Filter(HttpRequestMessage request, FilterContext context, CancellationToken cancellationToken) {
-        if (!request.Headers.Contains(HttpHeaders.AUTHORIZATION) && (request.RequestUri?.BelongsToDomain(GandiClient.ApiBase.Host) ?? false) && authTokenProvider() is {} authToken) {
+        if (!request.Headers.Contains(HttpHeaders.Authorization) && (request.RequestUri?.BelongsToDomain(GandiClient.ApiBase.Host) ?? false) && authTokenProvider() is {} authToken) {
             request.Headers.Authorization = authToken switch {
                 { Length: 24 }     => new AuthenticationHeaderValue(ApiKeyScheme, authToken), // API Key
                 _ /* Length: 40 */ => new AuthenticationHeaderValue(BearerScheme, authToken)  // Personal Access Token

@@ -79,7 +79,7 @@ public readonly struct DnsRecord {
             int hashCode = (int) Type;
             hashCode = (hashCode * 397) ^ Name.GetHashCode();
             hashCode = (hashCode * 397) ^ TimeToLive.GetHashCode();
-            return Values.Aggregate(hashCode, (current, value) => (current * 397) ^ value.GetHashCode());
+            return Values.Aggregate(hashCode, static (current, value) => (current * 397) ^ value.GetHashCode());
         }
     }
 

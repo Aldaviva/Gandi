@@ -61,10 +61,8 @@ public class GandiClient: IGandiClient {
 
     /// <inheritdoc cref="Dispose()" />
     protected virtual void Dispose(bool disposing) {
-        if (disposing) {
-            if (_disposeHttpClient) {
-                HttpClient.Dispose();
-            }
+        if (disposing && _disposeHttpClient) {
+            HttpClient.Dispose();
         }
     }
 
