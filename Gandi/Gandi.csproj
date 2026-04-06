@@ -36,7 +36,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.105,10.0.200)" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.26" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.27" />
     </ItemGroup>
     
     <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
