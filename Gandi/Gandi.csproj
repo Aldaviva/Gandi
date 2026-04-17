@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-        <Version>1.1.1</Version>
+        <Version>1.1.2</Version>
         <Authors>Ben Hutchison</Authors>
         <Copyright>© 2026 $(Authors)</Copyright>
         <Company>$(Authors)</Company>
@@ -36,12 +36,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.105,10.0.200)" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.28" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.106,10.0.200)" PrivateAssets="All" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.30" NoWarn="NU5104" />
     </ItemGroup>
     
     <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', '$(TargetFramework)'))">
-        <PackageReference Include="System.Net.Http.Json" Version="10.0.5" />
+        <PackageReference Include="System.Net.Http.Json" Version="10.0.6" />
     </ItemGroup>
     
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' != 'Debug'">
