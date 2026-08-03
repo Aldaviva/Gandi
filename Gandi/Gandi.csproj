@@ -37,7 +37,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.106,10.0.200)" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.31" NoWarn="NU5104" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.33" NoWarn="NU5104" />
     </ItemGroup>
     
     <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', '$(TargetFramework)'))">
