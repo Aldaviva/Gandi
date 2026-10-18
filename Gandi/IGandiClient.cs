@@ -17,7 +17,7 @@ public interface IGandiClient: IDisposable {
     HttpClient HttpClient { get; }
 
     /// <summary>
-    /// <para>Personal access Token for your user or organization which has permissions to manage your domain name technical configurations, created using
+    /// <para>Personal Access Token for your user or organization which has permissions to manage your domain name technical configurations, created using
     /// <see href="https://admin.gandi.net/organizations/account/pat"/> or <see href="https://admin.gandi.net/organizations/"/>.</para>
     /// <para>Can also be an API Key, although those can't be created anymore if you don't already have one.</para>
     /// </summary>

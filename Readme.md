@@ -5,7 +5,7 @@ Gandi
 
 *.NET REST client for the [Gandi v5 API](https://api.gandi.net/docs/reference/)*
 
-This library allows you to create, read, update, and delete [LiveDNS](https://www.gandi.net/en-US/domain/dns) DNS records in your [Gandi](https://www.gandi.net/) [domains](https://www.gandi.net/en-US/domain).
+This library allows you to create, read, update, and delete [LiveDNS](https://www.gandi.net/domain/dns) DNS records in your [Gandi](https://www.gandi.net/) [domains](https://www.gandi.net/domain).
 
 It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns), but it allows both Personal Access Token and API Key authentication, public types have interfaces so you can mock and actually test your dependent code, and it's compatible with a wider variety of runtimes.
 
@@ -27,12 +27,12 @@ It's similar to [G6.GandiLiveDns](https://www.nuget.org/packages/G6.GandiLiveDns
 <!-- /MarkdownTOC -->
 
 ## Prerequisites
-- [.NET](https://dot.net) runtime compatible with [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0)
+- [.NET](https://dot.net) runtime compatible with [.NET Standard 2.0](https://learn.microsoft.com/dotnet/standard/net-standard?tabs=net-standard-2-0)
     - .NET 5 or later
     - .NET Core 2 or later
     - .NET Framework 4.6.2 or later
-- [Gandi domain name](https://www.gandi.net/en-US/domain)
-    - ✅ Domain must be using [LiveDNS](https://www.gandi.net/en-US/domain/dns), the default for new domains (`ns-*-*.gandi.net`)
+- [Gandi domain name](https://www.gandi.net/domain)
+    - ✅ Domain must be using [LiveDNS](https://www.gandi.net/domain/dns), the default for new domains (`ns-*-*.gandi.net`)
     - ❌ Classic DNS (`*.dns.gandi.net`) is incompatible; you will need to [migrate to LiveDNS](https://docs.gandi.net/en/domain_names/common_operations/changing_nameservers.html#switching-to-livedns)
     - ❌ External nameservers (with glue records) are incompatible; you will need to update the record on the external nameserver instead of on Gandi's nameservers
 

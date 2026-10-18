@@ -9,12 +9,9 @@ public class LiveDnsTests {
 
     private readonly IGandiClient       _gandi = A.Fake<IGandiClient>();
     private readonly LiveDns            _liveDns;
-    private readonly UnfuckedHttpClient _httpClient = A.Fake<UnfuckedHttpClient>();
-
-    private static CancellationToken Ct => TestContext.Current.CancellationToken;
+    private readonly UnfuckedHttpClient _httpClient = A.Fake<UnfuckedHttpClient>(options => options.CallsBaseMethods()).Property(PropertyKey.JsonSerializerOptions, GandiClient.JsonOptions);
 
     public LiveDnsTests() {
-        _httpClient.Property(PropertyKey.JsonSerializerOptions, GandiClient.JsonOptions);
         A.CallTo(() => _gandi.HttpClient).Returns(_httpClient);
         _liveDns = new LiveDns(_gandi, "aldaviva.com");
     }
@@ -23,14 +20,14 @@ public class LiveDnsTests {
     public async Task ListAll() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.OK) {
             Content = new StringContent(
-                """[{"rrset_name":"@","rrset_type":"A","rrset_ttl":300,"rrset_values":["67.210.32.33"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/%40/A"},{"rrset_name":"west","rrset_type":"A","rrset_ttl":300,"rrset_values":["172.11.57.29"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"}]""",
+                """[{"rrset_name":"@","rrset_type":"A","rrset_ttl":300,"rrset_values":["204.11.166.180"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/%40/A"},{"rrset_name":"west","rrset_type":"A","rrset_ttl":300,"rrset_values":["172.11.57.29"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"}]""",
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(cancellationToken: Ct);
+        IEnumerable<DnsRecord> actual = await _liveDns.List(cancellationToken: TestContext.Current.CancellationToken);
 
         actual.Should().BeEquivalentTo([
-            new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "67.210.32.33"),
+            new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "204.11.166.180"),
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
         ]);
 
@@ -44,14 +41,14 @@ public class LiveDnsTests {
     public async Task ListByType() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.OK) {
             Content = new StringContent(
-                """[{"rrset_name":"@","rrset_type":"A","rrset_ttl":300,"rrset_values":["67.210.32.33"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/%40/A"},{"rrset_name":"west","rrset_type":"A","rrset_ttl":300,"rrset_values":["172.11.57.29"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"}]""",
+                """[{"rrset_name":"@","rrset_type":"A","rrset_ttl":300,"rrset_values":["204.11.166.180"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/%40/A"},{"rrset_name":"west","rrset_type":"A","rrset_ttl":300,"rrset_values":["172.11.57.29"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/west/A"}]""",
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, cancellationToken: Ct);
+        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, cancellationToken: TestContext.Current.CancellationToken);
 
         actual.Should().BeEquivalentTo([
-            new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "67.210.32.33"),
+            new DnsRecord(RecordType.A, "@", TimeSpan.FromMinutes(5), "204.11.166.180"),
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
         ]);
 
@@ -69,7 +66,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(name: "west", cancellationToken: Ct);
+        IEnumerable<DnsRecord> actual = await _liveDns.List(name: "west", cancellationToken: TestContext.Current.CancellationToken);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
@@ -89,7 +86,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, "west", Ct);
+        IEnumerable<DnsRecord> actual = await _liveDns.List(RecordType.A, "west", TestContext.Current.CancellationToken);
 
         actual.Should().BeEquivalentTo([
             new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29")
@@ -109,7 +106,7 @@ public class LiveDnsTests {
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
-        DnsRecord? actual = await _liveDns.Get(RecordType.A, "west", Ct);
+        DnsRecord? actual = await _liveDns.Get(RecordType.A, "west", TestContext.Current.CancellationToken);
 
         actual.Should().Be(new DnsRecord(RecordType.A, "west", TimeSpan.FromMinutes(5), "172.11.57.29"));
 
@@ -126,7 +123,7 @@ public class LiveDnsTests {
                 MediaTypeNames.Application.Json)
         });
 
-        DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"), Ct);
+        DnsRecord? actual = await _liveDns.Get(new DnsRecord(RecordType.A, "missing"), TestContext.Current.CancellationToken);
 
         actual.Should().BeNull();
 
@@ -140,14 +137,14 @@ public class LiveDnsTests {
                 Content = new StringContent("hargle invalid json", Encoding.UTF8, MediaTypeNames.Text.Plain)
             });
 
-        (await _liveDns.Get(RecordType.A, "_test", Ct)).Should().BeNull();
+        (await _liveDns.Get(RecordType.A, "_test", TestContext.Current.CancellationToken)).Should().BeNull();
     }
 
     [Fact]
     public async Task Delete() {
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>._, A<CancellationToken>._)).Returns(new HttpResponseMessage(HttpStatusCode.NoContent));
 
-        await _liveDns.Delete(new DnsRecord(RecordType.A, "deleteme"), Ct);
+        await _liveDns.Delete(new DnsRecord(RecordType.A, "deleteme"), TestContext.Current.CancellationToken);
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Delete, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/deleteme/A"),
@@ -162,7 +159,7 @@ public class LiveDnsTests {
             Headers = { Location = new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/_test/TXT") }
         });
 
-        await _liveDns.Set(new DnsRecord(RecordType.TXT, "_test", null, "hi"), Ct);
+        await _liveDns.Set(new DnsRecord(RecordType.TXT, "_test", null, "hi"), TestContext.Current.CancellationToken);
 
         A.CallTo(() => _httpClient.SendAsync(A<HttpRequest>.That.Matches(req =>
             req.Equals(new HttpRequest(HttpMethod.Put, new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/_test/TXT"),

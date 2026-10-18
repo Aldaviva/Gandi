@@ -1,7 +1,6 @@
 using Gandi.Dns;
 using Gandi.Marshal;
 using System.Net.Http.Headers;
-using Unfucked.HTTP.Config;
 
 namespace Gandi;
 

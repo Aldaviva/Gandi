@@ -34,14 +34,14 @@ public class GandiClientTest {
 
         A.CallTo(() => handler.TestableSendAsync(A<HttpRequestMessage>._, A<CancellationToken>._)).Returns(new HttpResponseMessage {
             Content = new StringContent(
-                """{"rrset_name":"@","rrset_type":"A","rrset_ttl":604800,"rrset_values":["67.210.32.33"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/@/A/api/v5/domains/aldaviva.com/records/@/A"}""",
+                """{"rrset_name":"@","rrset_type":"A","rrset_ttl":604800,"rrset_values":["204.11.166.180"],"rrset_href":"https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/@/A/api/v5/domains/aldaviva.com/records/@/A"}""",
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         });
 
         ILiveDns   liveDns = gandiClient.LiveDns("aldaviva.com");
         DnsRecord? actual  = await liveDns.Get(RecordType.A, DnsRecord.Origin, TestContext.Current.CancellationToken);
 
-        actual.Should().Be(new DnsRecord(RecordType.A, "@", TimeSpan.FromDays(7), "67.210.32.33"));
+        actual.Should().Be(new DnsRecord(RecordType.A, "@", TimeSpan.FromDays(7), "204.11.166.180"));
 
         A.CallTo(() => handler.TestableSendAsync(A<HttpRequestMessage>.That.Matches(req =>
             req.RequestUri == new Uri("https://api.gandi.net/v5/livedns/domains/aldaviva.com/records/@/A") &&

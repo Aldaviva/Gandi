@@ -8,16 +8,17 @@ string personalAccessToken = Environment.GetEnvironmentVariable(patVarName) ??
 
 using IGandiClient gandi = new GandiClient(personalAccessToken);
 
-ILiveDns liveDns = gandi.LiveDns("bjn.mobi");
+ILiveDns liveDns = gandi.LiveDns("aldaviva.com");
 
 foreach (DnsRecord record in await liveDns.List()) {
-    Console.WriteLine($"{record.Name}\t{record.Type}\t{record.TimeToLive?.TotalSeconds}\t{string.Join(';', record.Values)}");
+    Console.WriteLine($"{record.Name}\t{record.Type}\t{record.TimeToLive?.TotalSeconds}\t{record.Values.Join(';')}");
 }
 
+/*
 Console.WriteLine("Upserting record...");
 await liveDns.Set(new DnsRecord(RecordType.TXT, "_test", DnsRecord.MinTimeToLive, DateTime.Now.ToString("F")));
 
 Console.WriteLine("Fetching record...");
 Console.WriteLine($"Found: {(await liveDns.Get(RecordType.TXT, "_test"))!.Value.Values.First()}");
 
-await liveDns.Delete(RecordType.TXT, "_test");
+await liveDns.Delete(RecordType.TXT, "_test");*/

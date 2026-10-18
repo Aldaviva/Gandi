@@ -1,14 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-        <Version>1.1.2</Version>
+        <Version>1.1.3</Version>
         <Authors>Ben Hutchison</Authors>
         <Copyright>© 2026 $(Authors)</Copyright>
         <Company>$(Authors)</Company>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <WarningsAsErrors>CA1859</WarningsAsErrors>
+        <WarningsAsErrors>$(WarningsAsErrors);CA1859</WarningsAsErrors>
         <PackageProjectUrl>https://github.com/Aldaviva/Gandi</PackageProjectUrl>
         <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
         <PackageReleaseNotes>$(PackageProjectUrl)/releases/tag/$(Version)</PackageReleaseNotes>
@@ -28,7 +28,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- <AdditionalFiles Include="ExceptionAdjustments.txt" /> -->
         <InternalsVisibleTo Include="Tests;DynamicProxyGenAssembly2" />
         <None Include="..\Readme.md;icon.png" Pack="true" PackagePath="\" />
         <None Include="*.sln.DotSettings;*.csproj.DotSettings" Visible="false" />
@@ -36,15 +35,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.106,10.0.200)" PrivateAssets="All" />
-        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.31" NoWarn="NU5104" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.113,10.0.200)" PrivateAssets="All" />
+        <PackageReference Include="Unfucked.HTTP" Version="0.0.1-beta.36" NoWarn="NU5104" />
     </ItemGroup>
     
-    <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', '$(TargetFramework)'))">
-        <PackageReference Include="System.Net.Http.Json" Version="10.0.7" />
-    </ItemGroup>
-    
-    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' or '$(Configuration)' != 'Debug'">
+    <PropertyGroup Condition="'$(CI)' == 'true' or '$(Configuration)' != 'Debug'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
